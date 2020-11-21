@@ -12,16 +12,18 @@ backHeight = 30;
 potScrew = 9;
 redMuteScew = 10;
 minijackScew = 6;
-potDistance = 30;
+potDistanceV = 30;
+potMuteDistance = 10;
+potDistanceH = 50;
 potScrewHeight = 7;
 margin = 30;
 
-h = potDistance * m + margin * 2;
-w = potDistance * n + margin * 2;
+h = potDistanceV * (m - 1) + margin * 2;
+w = potDistanceH * (n - 1) + margin * 2;
 
 /*
 difference() {
-    square([potDistance * n + margin * 2, potDistance * m + margin * 2]);
+    square([potDistanceV * n + margin * 2, potDistanceV * m + margin * 2]);
     projection(cut = true) translate([0, 0, boardThickness / 2]) components();
 }
 */
@@ -49,10 +51,12 @@ module side() {
     cube([backBoardThickness, h - 2 * backBoardThickness, backHeight]);
 }
 
+// First Version
+/*
 module components() {
     translate([margin, margin, 0]) {
         for (i = [0:n], j = [0:m]) {
-            translate([i * potDistance, j * potDistance, 0]) {
+            translate([i * potDistanceV, j * potDistanceV, 0]) {
                 if (i == 0 && j == m) {}
                 else if (i == 0 || j == m) {
                     muteButton();
@@ -70,6 +74,32 @@ module components() {
                 } else {
                     pot();
                 }
+            }
+        }
+    }
+}
+*/
+
+// Second Version
+module components() {
+    translate([margin, margin, 0]) {
+        for (i = [0:n-1], j = [0:m-1]) {
+            translate([i * potDistanceV, j * potDistanceV, 0]) {
+                if (i == 0 || j == m-1) {
+                    if (i == 0) {
+                        translate([- margin + backBoardThickness, 0,  -boardThickness - backHeight / 2])
+                        rotate([0, -90, 0])
+                        minijack();
+                    }
+                    else if (j == m-1) {
+                        translate([0, margin - backBoardThickness,  -boardThickness - backHeight / 2])
+                        rotate([-90, 0, 0])
+                        minijack();
+                    }
+                }
+                pot();
+                translate([0, 0, -boardThickness])
+                switch();
             }
         }
     }
@@ -167,4 +197,39 @@ module minijack() {
     // Hole
     color("Black")
     cylinder(screwHeight + 0.1, d=3.5, false, $fn=40);
+}
+
+module switch() {
+    screwHeight = 9;
+    screwWidth = 6;
+    sideLen = 13;
+    sideHeight = 10;
+    handleHeight = 10;
+    handleWidth = 3;
+    rondelleWidth = 12;
+    rondelleHeight = 0.5;
+    nutHeight = 2;
+    nutWidth = 8.5;
+
+    translate([-sideLen/2, -sideLen/2, -sideHeight])
+    color("DarkBlue")
+    cube([sideLen, sideLen, sideHeight]);
+
+    color("Silver")
+    cylinder(screwHeight, d=screwWidth, true, $fn=40);
+    
+    rand = ((round(rands(0, 1, 1)[0])) - 0.5) * 24;
+    echo(rand);
+    translate([0, 0, screwHeight])
+    rotate([0, rand, 90])
+    color("Silver")
+    cylinder(handleHeight, d=handleWidth, true, $fn=20);
+    
+    translate([0, 0, boardThickness])
+    color("Silver")
+    cylinder(nutHeight, d=nutWidth, false, $fn=6);
+
+    translate([0, 0, boardThickness])
+    color("Silver")
+    cylinder(rondelleHeight, d=rondelleWidth, false, $fn=40);
 }
