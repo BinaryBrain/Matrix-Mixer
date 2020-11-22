@@ -23,17 +23,19 @@ margin = 20;
 h = potDistanceV * (m - 1) + margin * 2;
 w = potDistanceH * (n - 1) + margin * 2 + potMuteDistance;
 
-/*
+
 difference() {
-    square([potDistanceV * n + margin * 2, potDistanceV * m + margin * 2]);
+    square([w, h]);
     projection(cut = true) translate([0, 0, boardThickness / 2]) components();
 }
-*/
 
+
+/*
 board();
 components();
 back();
 side();
+*/
 
 module board() {
     translate([0, 0, -boardThickness])
@@ -221,7 +223,6 @@ module switch() {
     cylinder(switchScrewHeight, d=switchScrewWidth, true, $fn=40);
     
     rand = ((round(rands(0, 1, 1)[0])) - 0.5) * 24;
-    echo(rand);
     translate([0, 0, switchScrewHeight])
     rotate([0, rand, 90])
     color("Silver")
