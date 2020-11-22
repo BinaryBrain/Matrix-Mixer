@@ -9,17 +9,19 @@ m = 4;
 boardThickness = 3;
 backBoardThickness = 2;
 backHeight = 30;
-potScrew = 9;
 redMuteScew = 10;
 minijackScew = 6;
 potDistanceV = 30;
-potMuteDistance = 10;
-potDistanceH = 50;
+potMuteDistance = 17;
+potDistanceH = 45;
 potScrewHeight = 7;
-margin = 30;
+potScrewWidth = 9;
+switchScrewHeight = 9;
+switchScrewWidth = 6;
+margin = 20;
 
 h = potDistanceV * (m - 1) + margin * 2;
-w = potDistanceH * (n - 1) + margin * 2;
+w = potDistanceH * (n - 1) + margin * 2 + potMuteDistance;
 
 /*
 difference() {
@@ -84,21 +86,23 @@ module components() {
 module components() {
     translate([margin, margin, 0]) {
         for (i = [0:n-1], j = [0:m-1]) {
-            translate([i * potDistanceV, j * potDistanceV, 0]) {
+            translate([i * potDistanceH, j * potDistanceV, 0]) {
                 if (i == 0 || j == m-1) {
                     if (i == 0) {
                         translate([- margin + backBoardThickness, 0,  -boardThickness - backHeight / 2])
                         rotate([0, -90, 0])
                         minijack();
                     }
-                    else if (j == m-1) {
-                        translate([0, margin - backBoardThickness,  -boardThickness - backHeight / 2])
+                    if (j == m-1) {
+                        offset = potScrewWidth / 2 + potMuteDistance / 2 - switchScrewWidth / 2;
+                        translate([offset
+                        , margin - backBoardThickness,  -boardThickness - backHeight / 2])
                         rotate([-90, 0, 0])
                         minijack();
                     }
                 }
                 pot();
-                translate([0, 0, -boardThickness])
+                translate([potMuteDistance, 0, -boardThickness])
                 switch();
             }
         }
@@ -144,7 +148,7 @@ module potCap() {
 
 module potScrew() {
     translate([0, 0, - boardThickness])
-    cylinder(potScrewHeight, d=potScrew, true, $fn=40);
+    cylinder(potScrewHeight, d=potScrewWidth, true, $fn=40);
     cylinder(2, d=12.5, false, $fn=6);
 }
 
@@ -200,8 +204,6 @@ module minijack() {
 }
 
 module switch() {
-    screwHeight = 9;
-    screwWidth = 6;
     sideLen = 13;
     sideHeight = 10;
     handleHeight = 10;
@@ -216,11 +218,11 @@ module switch() {
     cube([sideLen, sideLen, sideHeight]);
 
     color("Silver")
-    cylinder(screwHeight, d=screwWidth, true, $fn=40);
+    cylinder(switchScrewHeight, d=switchScrewWidth, true, $fn=40);
     
     rand = ((round(rands(0, 1, 1)[0])) - 0.5) * 24;
     echo(rand);
-    translate([0, 0, screwHeight])
+    translate([0, 0, switchScrewHeight])
     rotate([0, rand, 90])
     color("Silver")
     cylinder(handleHeight, d=handleWidth, true, $fn=20);
@@ -229,7 +231,7 @@ module switch() {
     color("Silver")
     cylinder(nutHeight, d=nutWidth, false, $fn=6);
 
-    translate([0, 0, boardThickness])
-    color("Silver")
-    cylinder(rondelleHeight, d=rondelleWidth, false, $fn=40);
+    // translate([0, 0, boardThickness])
+    // color("Silver")
+    // cylinder(rondelleHeight, d=rondelleWidth, false, $fn=40);
 }
