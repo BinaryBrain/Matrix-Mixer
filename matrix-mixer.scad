@@ -12,30 +12,32 @@ backHeight = 30;
 redMuteScew = 10;
 minijackScew = 6;
 potDistanceV = 30;
-potMuteDistance = 17;
-potDistanceH = 45;
+potMuteDistance = 15;
+potDistanceH = 38;
 potScrewHeight = 7;
 potScrewWidth = 9;
 switchScrewHeight = 9;
 switchScrewWidth = 6;
-margin = 20;
+potBaseDiameter = 15;
 
-h = potDistanceV * (m - 1) + margin * 2;
-w = potDistanceH * (n - 1) + margin * 2 + potMuteDistance;
+margin = 15;
+marginSwitchSide = margin + switchScrewWidth / 2;
+marginOtherSides = margin + potBaseDiameter / 2;
 
+h = potDistanceV * (m - 1) + marginOtherSides * 2;
+w = potDistanceH * (n - 1) + (marginSwitchSide + marginOtherSides) + potMuteDistance;
 
+/*
 difference() {
     square([w, h]);
     projection(cut = true) translate([0, 0, boardThickness / 2]) components();
 }
+*/
 
-
-/*
 board();
 components();
 back();
 side();
-*/
 
 module board() {
     translate([0, 0, -boardThickness])
@@ -86,26 +88,27 @@ module components() {
 
 // Second Version
 module components() {
-    translate([margin, margin, 0]) {
+    translate([marginSwitchSide, marginOtherSides, 0]) {
         for (i = [0:n-1], j = [0:m-1]) {
             translate([i * potDistanceH, j * potDistanceV, 0]) {
                 if (i == 0 || j == m-1) {
                     if (i == 0) {
-                        translate([- margin + backBoardThickness, 0,  -boardThickness - backHeight / 2])
+                        translate([- marginSwitchSide + backBoardThickness, 0,  -boardThickness - backHeight / 2])
                         rotate([0, -90, 0])
                         minijack();
                     }
                     if (j == m-1) {
                         offset = potScrewWidth / 2 + potMuteDistance / 2 - switchScrewWidth / 2;
                         translate([offset
-                        , margin - backBoardThickness,  -boardThickness - backHeight / 2])
+                        , marginOtherSides - backBoardThickness,  -boardThickness - backHeight / 2])
                         rotate([-90, 0, 0])
                         minijack();
                     }
                 }
-                pot();
-                translate([potMuteDistance, 0, -boardThickness])
+                translate([0, 0, -boardThickness])
                 switch();
+                translate([potMuteDistance, 0, 0])
+                pot();
             }
         }
     }
@@ -137,7 +140,6 @@ module pot() {
 
 module potCap() {
     potCapHeight = 15;
-    potBaseDiameter = 15;
     potTopDiameter = 14;
     color([0.2, 0.2, 0.2])
     cylinder(potCapHeight, d1=potBaseDiameter, d2=potTopDiameter, false, $fn=40);
